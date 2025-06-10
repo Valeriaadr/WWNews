@@ -285,7 +285,7 @@ export default function LandingPage() {
           <li>Borra aplicaciones que ya no uses</li>
           <li>Revisa qué aplicaciones tienen acceso a tu ubicación, fotos, contactos</li>
           <li>Ve a Configuración → Privacidad en tu teléfono</li>
-        </ul>
+          </ul>
         
         <h3>Paso 5: Mantén todo actualizado</h3>
         <h4>¿Por qué es importante?</h4>
@@ -1094,7 +1094,7 @@ export default function LandingPage() {
           <li><strong>Redes sociales:</strong> Usa bloqueadores como Cold Turkey o Freedom</li>
           <li><strong>Ruido:</strong> Audífonos con cancelación de ruido o música instrumental</li>
           <li><strong>Interrupciones:</strong> Señal visual para familia (puerta cerrada, letrero, etc.)</li>
-        </ul>
+          </ul>
         
         <h4>Descansos regulares</h4>
         <ul>
@@ -1291,7 +1291,7 @@ export default function LandingPage() {
         <h4>Para WhatsApp:</h4>
         <ol>
           <li>Activa verificación en dos pasos</li>
-          <li>Configura mensajes que desaparecen para chats sensibles</li>
+          <li>Configura autodestrucción de mensajes para chats sensibles</li>
           <li>Desactiva respaldos en la nube si manejas información muy sensible</li>
           <li>Revisa configuración de privacidad (quién ve tu foto, estado, etc.)</li>
           <li>Activa notificaciones de seguridad</li>
@@ -1451,166 +1451,166 @@ export default function LandingPage() {
           </tr>
           <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Procesador</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Snapdragon 8 Gen 3</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Snapdragon 8 Gen 2</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">IA integrada</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Galaxy AI</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">Limitada</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Batería</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">4,000 mAh</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">3,900 mAh</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Precio inicial</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">$799 USD</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">$799 USD</td>
-          </tr>
-        </table>
-        
-        <h3>¿Deberías actualizar?</h3>
-        
-        <h4>SÍ, actualiza si tienes:</h4>
-        <ul>
-          <li><strong>Galaxy S21 o anterior:</strong> Notarás mejoras significativas</li>
-          <li><strong>Un teléfono con problemas de batería:</strong> El S24 tiene mejor eficiencia</li>
-          <li><strong>Necesidades de cámara profesional:</strong> Las mejoras en foto/video son notables</li>
-          <li><strong>Uso intensivo de IA:</strong> Las funciones nuevas pueden ser muy útiles</li>
-          <li><strong>Problemas de rendimiento:</strong> El nuevo procesador es mucho más rápido</li>
-        </ul>
-        
-        <h4>NO actualices si tienes:</h4>
-        <ul>
-          <li><strong>Galaxy S23:</strong> Las mejoras son incrementales</li>
-          <li><strong>Presupuesto ajustado:</strong> El S23 sigue siendo excelente y ahora más barato</li>
-          <li><strong>Tu teléfono actual funciona bien:</strong> No hay urgencia real</li>
-          <li><strong>No usas funciones avanzadas:</strong> Para uso básico, no justifica el costo</li>
-        </ul>
-        
-        <h3>Comparación con la competencia</h3>
-        
-        <h4>Galaxy S24 vs iPhone 15</h4>
-        <ul>
-          <li><strong>Cámara:</strong> Empate, ambos excelentes con fortalezas diferentes</li>
-          <li><strong>Rendimiento:</strong> iPhone ligeramente superior en benchmarks</li>
-          <li><strong>IA:</strong> Galaxy S24 tiene más funciones de IA integradas</li>
-          <li><strong>Personalización:</strong> Android permite más customización</li>
-          <li><strong>Ecosistema:</strong> iPhone mejor si tienes otros productos Apple</li>
-          <li><strong>Precio:</strong> Similar, pero Galaxy ofrece más opciones de almacenamiento</li>
-        </ul>
-        
-        <h4>Galaxy S24 vs Google Pixel 8</h4>
-        <ul>
-          <li><strong>IA:</strong> Pixel tiene ventaja en procesamiento de fotos con IA</li>
-          <li><strong>Android puro:</strong> Pixel recibe actualizaciones más rápido</li>
-          <li><strong>Hardware:</strong> Galaxy S24 tiene mejor pantalla y construcción</li>
-          <li><strong>Precio:</strong> Pixel 8 generalmente más barato</li>
-          <li><strong>Soporte:</strong> Pixel promete 7 años de actualizaciones</li>
-        </ul>
-        
-        <h3>Precios y disponibilidad</h3>
-        
-        <h4>Precios de lanzamiento (USD):</h4>
-        <ul>
-          <li><strong>Galaxy S24 (128GB):</strong> $799</li>
-          <li><strong>Galaxy S24+ (256GB):</strong> $999</li>
-          <li><strong>Galaxy S24 Ultra (256GB):</strong> $1,299</li>
-        </ul>
-        
-        <h4>¿Cuál elegir?</h4>
-        <ul>
-          <li><strong>S24 básico:</strong> Para la mayoría de usuarios, excelente relación calidad-precio</li>
-          <li><strong>S24+:</strong> Si quieres pantalla más grande y mejor batería</li>
-          <li><strong>S24 Ultra:</strong> Para usuarios power que necesitan S Pen y la mejor cámara</li>
-        </ul>
-        
-        <h3>Funciones de IA en detalle</h3>
-        
-        <h4>Live Translate (Traducción en vivo)</h4>
-        <p><strong>Cómo funciona:</strong> Durante una llamada, el teléfono traduce en tiempo real lo que dice la otra persona y lo que dices tú.</p>
-        <p><strong>Idiomas soportados:</strong> 13 idiomas inicialmente, incluyendo español, inglés, francés, alemán, etc.</p>
-        <p><strong>¿Es útil?</strong> Muy útil para viajes de negocios o comunicación internacional.</p>
-        
-        <h4>Circle to Search</h4>
-        <p><strong>Cómo funciona:</strong> Mantén presionado el botón de inicio, encierra cualquier objeto en la pantalla, y Google lo buscará automáticamente.</p>
-        <p><strong>Casos de uso:</strong> Identificar plantas, buscar productos, traducir texto en imágenes.</p>
-        
-        <h4>Photo Assist</h4>
-        <p><strong>Funciones:</strong></p>
-        <ul>
-          <li>Eliminar objetos no deseados de fotos</li>
-          <li>Mover objetos dentro de la foto</li>
-          <li>Mejorar resolución de imágenes</li>
-          <li>Cambiar fondos automáticamente</li>
-        </ul>
-        
-        <h3>Problemas y limitaciones</h3>
-        
-        <h4>Aspectos negativos:</h4>
-        <ul>
-          <li><strong>Precio alto:</strong> Sigue siendo caro para muchos presupuestos</li>
-          <li><strong>IA requiere internet:</strong> Muchas funciones de IA necesitan conexión</li>
-          <li><strong>Bloatware:</strong> Samsung incluye muchas apps preinstaladas</li>
-          <li><strong>Actualizaciones lentas:</strong> Android puro (Pixel) recibe actualizaciones más rápido</li>
-          <li><strong>Carga lenta:</strong> 45W es bueno pero no el más rápido del mercado</li>
-        </ul>
-        
-        <h4>Problemas reportados por usuarios:</h4>
-        <ul>
-          <li>Algunos problemas menores de software en el lanzamiento</li>
-          <li>La IA a veces comete errores en traducciones</li>
-          <li>Calentamiento durante uso muy intensivo</li>
-          <li>Duración de batería variable según uso de IA</li>
-        </ul>
-        
-        <h3>Alternativas a considerar</h3>
-        
-        <h4>Si el S24 es muy caro:</h4>
-        <ul>
-          <li><strong>Galaxy S23:</strong> Ahora más barato, sigue siendo excelente</li>
-          <li><strong>Galaxy A54:</strong> Gama media con muchas funciones del S24</li>
-          <li><strong>Google Pixel 7a:</strong> Excelente cámara a menor precio</li>
-          <li><strong>OnePlus 12:</strong> Rendimiento similar, precio más bajo</li>
-        </ul>
-        
-        <h4>Si quieres algo diferente:</h4>
-        <ul>
-          <li><strong>iPhone 15:</strong> Si prefieres iOS</li>
-          <li><strong>Google Pixel 8:</strong> Para Android puro y mejor IA fotográfica</li>
-          <li><strong>Xiaomi 14:</strong> Especificaciones similares, precio más bajo</li>
-        </ul>
-        
-        <h3>Consejos para la compra</h3>
-        
-        <h4>Cuándo comprar:</h4>
-        <ul>
-          <li><strong>Inmediatamente:</strong> Si necesitas un teléfono nuevo urgentemente</li>
-          <li><strong>En 3-6 meses:</strong> Para evitar problemas iniciales de software</li>
-          <li><strong>Black Friday/Cyber Monday:</strong> Para mejores descuentos</li>
-          <li><strong>Cuando salga el S25:</strong> El S24 bajará de precio</li>
-        </ul>
-        
-        <h4>Dónde comprar:</h4>
-        <ul>
-          <li><strong>Samsung directamente:</strong> Mejores ofertas de trade-in</li>
-          <li><strong>Operadoras:</strong> Planes de financiamiento</li>
-          <li><strong>Retailers:</strong> Amazon, Best Buy para comparar precios</li>
-          <li><strong>Costco/Sam's:</strong> A veces incluyen accesorios gratis</li>
-        </ul>
-        
-        <h4>Accesorios recomendados:</h4>
-        <ul>
-          <li><strong>Funda:</strong> Protección esencial ($20-50 USD)</li>
-          <li><strong>Protector de pantalla:</strong> Cristal templado ($10-30 USD)</li>
-          <li><strong>Cargador inalámbrico:</strong> Para aprovechar la carga rápida ($30-60 USD)</li>
-          <li><strong>Galaxy Buds:</strong> Integración perfecta con el teléfono ($100-200 USD)</li>
-        </ul>
-        
-        <p><strong>Conclusión:</strong> El Galaxy S24 es una evolución sólida con mejoras reales en IA, cámara y eficiencia. Si tienes un teléfono de 2-3 años o más, la actualización vale la pena. Si tienes un S23 o teléfono reciente de gama alta, las mejoras son incrementales. Las funciones de IA son impresionantes pero no revolucionarias. Para la mayoría de usuarios, el S24 básico ofrece la mejor relación calidad-precio de la serie.</p>
-      `,
+          <td style="padding: 8px; border: 1px solid #ddd;">Snapdragon 8 Gen 3</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">Snapdragon 8 Gen 2</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;">IA integrada</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">Galaxy AI</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">Limitada</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;">Batería</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">4,000 mAh</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">3,900 mAh</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;">Precio inicial</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">$799 USD</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">$799 USD</td>
+        </tr>
+      </table>
+      
+      <h3>¿Deberías actualizar?</h3>
+      
+      <h4>SÍ, actualiza si tienes:</h4>
+      <ul>
+        <li><strong>Galaxy S21 o anterior:</strong> Notarás mejoras significativas</li>
+        <li><strong>Un teléfono con problemas de batería:</strong> El S24 tiene mejor eficiencia</li>
+        <li><strong>Necesidades de cámara profesional:</strong> Las mejoras en foto/video son notables</li>
+        <li><strong>Uso intensivo de IA:</strong> Las funciones nuevas pueden ser muy útiles</li>
+        <li><strong>Problemas de rendimiento:</strong> El nuevo procesador es mucho más rápido</li>
+      </ul>
+      
+      <h4>NO actualices si tienes:</h4>
+      <ul>
+        <li><strong>Galaxy S23:</strong> Las mejoras son incrementales</li>
+        <li><strong>Presupuesto ajustado:</strong> El S23 sigue siendo excelente y ahora más barato</li>
+        <li><strong>Tu teléfono actual funciona bien:</strong> No hay urgencia real</li>
+        <li><strong>No usas funciones avanzadas:</strong> Para uso básico, no justifica el costo</li>
+      </ul>
+      
+      <h3>Comparación con la competencia</h3>
+      
+      <h4>Galaxy S24 vs iPhone 15</h4>
+      <ul>
+        <li><strong>Cámara:</strong> Empate, ambos excelentes con fortalezas diferentes</li>
+        <li><strong>Rendimiento:</strong> iPhone ligeramente superior en benchmarks</li>
+        <li><strong>IA:</strong> Galaxy S24 tiene más funciones de IA integradas</li>
+        <li><strong>Personalización:</strong> Android permite más customización</li>
+        <li><strong>Ecosistema:</strong> iPhone mejor si tienes otros productos Apple</li>
+        <li><strong>Precio:</strong> Similar, pero Galaxy ofrece más opciones de almacenamiento</li>
+      </ul>
+      
+      <h4>Galaxy S24 vs Google Pixel 8</h4>
+      <ul>
+        <li><strong>IA:</strong> Pixel tiene ventaja en procesamiento de fotos con IA</li>
+        <li><strong>Android puro:</strong> Pixel recibe actualizaciones más rápido</li>
+        <li><strong>Hardware:</strong> Galaxy S24 tiene mejor pantalla y construcción</li>
+        <li><strong>Precio:</strong> Pixel 8 generalmente más barato</li>
+        <li><strong>Soporte:</strong> Pixel promete 7 años de actualizaciones</li>
+      </ul>
+      
+      <h3>Precios y disponibilidad</h3>
+      
+      <h4>Precios de lanzamiento (USD):</h4>
+      <ul>
+        <li><strong>Galaxy S24 (128GB):</strong> $799</li>
+        <li><strong>Galaxy S24+ (256GB):</strong> $999</li>
+        <li><strong>Galaxy S24 Ultra (256GB):</strong> $1,299</li>
+      </ul>
+      
+      <h4>¿Cuál elegir?</h4>
+      <ul>
+        <li><strong>S24 básico:</strong> Para la mayoría de usuarios, excelente relación calidad-precio</li>
+        <li><strong>S24+:</strong> Si quieres pantalla más grande y mejor batería</li>
+        <li><strong>S24 Ultra:</strong> Para usuarios power que necesitan S Pen y la mejor cámara</li>
+      </ul>
+      
+      <h3>Funciones de IA en detalle</h3>
+      
+      <h4>Live Translate (Traducción en vivo)</h4>
+      <p><strong>Cómo funciona:</strong> Durante una llamada, el teléfono traduce en tiempo real lo que dice la otra persona y lo que dices tú.</p>
+      <p><strong>Idiomas soportados:</strong> 13 idiomas inicialmente, incluyendo español, inglés, francés, alemán, etc.</p>
+      <p><strong>¿Es útil?</strong> Muy útil para viajes de negocios o comunicación internacional.</p>
+      
+      <h4>Circle to Search</h4>
+      <p><strong>Cómo funciona:</strong> Mantén presionado el botón de inicio, encierra cualquier objeto en la pantalla, y Google lo buscará automáticamente.</p>
+      <p><strong>Casos de uso:</strong> Identificar plantas, buscar productos, traducir texto en imágenes.</p>
+      
+      <h4>Photo Assist</h4>
+      <p><strong>Funciones:</strong></p>
+      <ul>
+        <li>Eliminar objetos no deseados de fotos</li>
+        <li>Mover objetos dentro de la foto</li>
+        <li>Mejorar resolución de imágenes</li>
+        <li>Cambiar fondos automáticamente</li>
+      </ul>
+      
+      <h3>Problemas y limitaciones</h3>
+      
+      <h4>Aspectos negativos:</h4>
+      <ul>
+        <li><strong>Precio alto:</strong> Sigue siendo caro para muchos presupuestos</li>
+        <li><strong>IA requiere internet:</strong> Muchas funciones de IA necesitan conexión</li>
+        <li><strong>Bloatware:</strong> Samsung incluye muchas apps preinstaladas</li>
+        <li><strong>Actualizaciones lentas:</strong> Android puro (Pixel) recibe actualizaciones más rápido</li>
+        <li><strong>Carga lenta:</strong> 45W es bueno pero no el más rápido del mercado</li>
+      </ul>
+      
+      <h4>Problemas reportados por usuarios:</h4>
+      <ul>
+        <li>Algunos problemas menores de software en el lanzamiento</li>
+        <li>La IA a veces comete errores en traducciones</li>
+        <li>Calentamiento durante uso muy intensivo</li>
+        <li>Duración de batería variable según uso de IA</li>
+      </ul>
+      
+      <h3>Alternativas a considerar</h3>
+      
+      <h4>Si el S24 es muy caro:</h4>
+      <ul>
+        <li><strong>Galaxy S23:</strong> Ahora más barato, sigue siendo excelente</li>
+        <li><strong>Galaxy A54:</strong> Gama media con muchas funciones del S24</li>
+        <li><strong>Google Pixel 7a:</strong> Excelente cámara a menor precio</li>
+        <li><strong>OnePlus 12:</strong> Rendimiento similar, precio más bajo</li>
+      </ul>
+      
+      <h4>Si quieres algo diferente:</h4>
+      <ul>
+        <li><strong>iPhone 15:</strong> Si prefieres iOS</li>
+        <li><strong>Google Pixel 8:</strong> Para Android puro y mejor IA fotográfica</li>
+        <li><strong>Xiaomi 14:</strong> Especificaciones similares, precio más bajo</li>
+      </ul>
+      
+      <h3>Consejos para la compra</h3>
+      
+      <h4>Cuándo comprar:</h4>
+      <ul>
+        <li><strong>Inmediatamente:</strong> Si necesitas un teléfono nuevo urgentemente</li>
+        <li><strong>En 3-6 meses:</strong> Para evitar problemas iniciales de software</li>
+        <li><strong>Black Friday/Cyber Monday:</strong> Para mejores descuentos</li>
+        <li><strong>Cuando salga el S25:</strong> El S24 bajará de precio</li>
+      </ul>
+      
+      <h4>Dónde comprar:</h4>
+      <ul>
+        <li><strong>Samsung directamente:</strong> Mejores ofertas de trade-in</li>
+        <li><strong>Operadoras:</strong> Planes de financiamiento</li>
+        <li><strong>Retailers:</strong> Amazon, Best Buy para comparar precios</li>
+        <li><strong>Costco/Sam's:</strong> A veces incluyen accesorios gratis</li>
+      </ul>
+      
+      <h4>Accesorios recomendados:</h4>
+      <ul>
+        <li><strong>Funda:</strong> Protección esencial ($20-50 USD)</li>
+        <li><strong>Protector de pantalla:</strong> Cristal templado ($10-30 USD)</li>
+        <li><strong>Cargador inalámbrico:</strong> Para aprovechar la carga rápida ($30-60 USD)</li>
+        <li><strong>Galaxy Buds:</strong> Integración perfecta con el teléfono ($100-200 USD)</li>
+      </ul>
+      
+      <p><strong>Conclusión:</strong> El Galaxy S24 es una evolución sólida con mejoras reales en IA, cámara y eficiencia. Si tienes un teléfono de 2-3 años o más, la actualización vale la pena. Si tienes un S23 o teléfono reciente de gama alta, las mejoras son incrementales. Las funciones de IA son impresionantes pero no revolucionarias. Para la mayoría de usuarios, el S24 básico ofrece la mejor relación calidad-precio de la serie.</p>
+    `,
     },
     {
       id: 10,
@@ -2393,15 +2393,14 @@ export default function LandingPage() {
                     src="/105/media/us/iphone/family/2025/e7ff365a-cb59-4ce9-9cdf-4cb965455b69/anim/welcome/medium_2x.mp4#t=6.513572"
                     type="video/mp4"
                   />
-                  </video>              
-                  <Image
-                    src="https://th.bing.com/th/id/R.64c24b79854932ede4a4fef035ee876b?rik=HPfSV6e9RUbMZg&riu=http%3a%2f%2fimg.youtube.com%2fvi%2feDqfg_LexCQ%2fmaxresdefault.jpg&ehk=A90BDg8QynRurVr22VmGkhZJ5lf5YtfbEMWfik12mXU%3d&risl=&pid=ImgRaw&r=0"
-                    alt="iPhone 16"
-                    fill
-                    className="object-cover rounded-lg"
-                    style={{ position: 'absolute', top: 0, left: 0 }}
-                    />
-                  
+                </video>
+                <Image
+                  src="https://th.bing.com/th/id/R.64c24b79854932ede4a4fef035ee876b?rik=HPfSV6e9RUbMZg&riu=http%3a%2f%2fimg.youtube.com%2fvi%2feDqfg_LexCQ%2fmaxresdefault.jpg&ehk=A90BDg8QynRurVr22VmGkhZJ5lf5YtfbEMWfik12mXU%3d&risl=&pid=ImgRaw&r=0"
+                  alt="iPhone 16"
+                  fill
+                  className="object-cover rounded-lg"
+                  style={{ position: "absolute", top: 0, left: 0 }}
+                />
               </div>
             </div>
           </div>
@@ -2418,7 +2417,7 @@ export default function LandingPage() {
                 Descubre los últimos avances en IA, gadgets y tecnología sin complicaciones. Noticias tech para todos,
                 explicadas en español claro y sencillo.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex justify-center">
                 <Button
                   onClick={() => {
                     handleCategoryClick("all")
@@ -2434,7 +2433,6 @@ export default function LandingPage() {
                 >
                   Últimas Noticias Tech
                 </Button>
-                
               </div>
             </div>
           </div>
@@ -2481,7 +2479,12 @@ export default function LandingPage() {
                     ? "Noticias Tech Destacadas"
                     : `${getCategoryName(selectedCategory)} Destacadas`}
                 </h2>
-
+                <button
+                  onClick={() => setShowAllNews(!showAllNews)}
+                  className="flex items-center text-blue-300 hover:text-blue-400"
+                >
+                  {showAllNews ? "Ver menos" : "Ver todas"} <ArrowRight className="ml-2 h-4 w-4" />
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
