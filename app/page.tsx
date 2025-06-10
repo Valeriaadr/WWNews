@@ -2430,26 +2430,11 @@ export default function LandingPage() {
                       }
                     }, 100)
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-purple-800 hover:bg-purple-500 text-white"
                 >
                   Últimas Noticias Tech
                 </Button>
-                <Button
-                  onClick={() => {
-                    handleCategoryClick("tutoriales")
-                    // Scroll to news section
-                    setTimeout(() => {
-                      const newsSection = document.querySelector('[data-section="featured-news"]')
-                      if (newsSection) {
-                        newsSection.scrollIntoView({ behavior: "smooth" })
-                      }
-                    }, 100)
-                  }}
-                  variant="outline"
-                  className="border-white/30 bg-white/10 text-white hover:bg-white/20"
-                >
-                  Guías para Principiantes
-                </Button>
+                
               </div>
             </div>
           </div>
@@ -2496,12 +2481,7 @@ export default function LandingPage() {
                     ? "Noticias Tech Destacadas"
                     : `${getCategoryName(selectedCategory)} Destacadas`}
                 </h2>
-                <button
-                  onClick={() => setShowAllNews(!showAllNews)}
-                  className="flex items-center text-blue-300 hover:text-blue-400"
-                >
-                  {showAllNews ? "Ver menos" : "Ver todas"} <ArrowRight className="ml-2 h-4 w-4" />
-                </button>
+
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
