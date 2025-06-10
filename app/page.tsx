@@ -2418,21 +2418,6 @@ export default function LandingPage() {
                 explicadas en español claro y sencillo.
               </p>
               <div className="flex justify-center">
-                <Button
-                  onClick={() => {
-                    handleCategoryClick("all")
-                    // Scroll to news section
-                    setTimeout(() => {
-                      const newsSection = document.querySelector('[data-section="featured-news"]')
-                      if (newsSection) {
-                        newsSection.scrollIntoView({ behavior: "smooth" })
-                      }
-                    }, 100)
-                  }}
-                  className="bg-purple-800 hover:bg-purple-500 text-white"
-                >
-                  Últimas Noticias Tech
-                </Button>
               </div>
             </div>
           </div>
