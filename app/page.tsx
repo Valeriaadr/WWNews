@@ -2373,7 +2373,7 @@ export default function LandingPage() {
                   href="https://www.apple.com/iphone-16/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md"
+                  className="inline-flex items-center bg-black hover:bg-black text-white text-sm px-4 py-2 rounded-md"
                 >
                   Conoce más
                 </a>
@@ -2393,14 +2393,15 @@ export default function LandingPage() {
                     src="/105/media/us/iphone/family/2025/e7ff365a-cb59-4ce9-9cdf-4cb965455b69/anim/welcome/medium_2x.mp4#t=6.513572"
                     type="video/mp4"
                   />
-                  {/* Fallback image in case video doesn't load */}
+                  </video>              
                   <Image
-                    src="https://images.unsplash.com/photo-1695048133142-1a20484403d8?q=80&w=2070&auto=format&fit=crop"
+                    src="https://th.bing.com/th/id/R.64c24b79854932ede4a4fef035ee876b?rik=HPfSV6e9RUbMZg&riu=http%3a%2f%2fimg.youtube.com%2fvi%2feDqfg_LexCQ%2fmaxresdefault.jpg&ehk=A90BDg8QynRurVr22VmGkhZJ5lf5YtfbEMWfik12mXU%3d&risl=&pid=ImgRaw&r=0"
                     alt="iPhone 16"
                     fill
                     className="object-cover rounded-lg"
-                  />
-                </video>
+                    style={{ position: 'absolute', top: 0, left: 0 }}
+                    />
+                  
               </div>
             </div>
           </div>
