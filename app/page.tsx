@@ -973,7 +973,7 @@ export default function LandingPage() {
         </ul>
         
         <h4>Dropbox</h4>
-        <p><strong>Almacenamiento:</strong> 2GB gratis, planes desde $9.99 USD/mes</p>
+        <p><strong>Almacenamiento:</strong> 2GB gratis, plans desde $9.99 USD/mes</p>
         <p><strong>Ventajas:</strong></p>
         <ul>
           <li>Sincronización muy rápida</li>
@@ -1684,6 +1684,8 @@ export default function LandingPage() {
           <li>Toca "Herramientas" → "Ajustar imagen"</li>
           <li>Deja que la IA haga ajustes automáticos</li>
           <li>Usa "Healing" para eliminar objetos no deseados</li>
+          <li>Aplica filtros: Ve a "Looks" para estilos predefinidos</li>
+          <li>Guarda: Toca "Exportar" → "Guardar"</li>
         </ol>
         
         <h4>VSCO</h4>
@@ -2359,12 +2361,47 @@ export default function LandingPage() {
               <span className="text-xs text-blue-200 uppercase tracking-wide">Publicidad</span>
               <button className="text-blue-200 hover:text-white text-xs">✕</button>
             </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-bold text-white mb-2">Aprende Tecnología Fácil</h3>
-              <p className="text-blue-100 text-sm mb-4">
-                Cursos online diseñados para principiantes - Sin tecnicismos complicados
-              </p>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm">Explorar cursos</Button>
+
+            <div className="mt-4 flex flex-col md:flex-row items-center justify-between">
+              <div className="mb-4 md:mb-0 text-left">
+                <h3 className="text-lg font-bold text-white mb-2">iPhone 16 - Diseñado para Apple Intelligence</h3>
+                <p className="text-blue-100 text-sm mb-4">
+                  Descubre el nuevo iPhone 16 con chip A18, Control de Cámara y colores vibrantes. Construido para Apple
+                  Intelligence.
+                </p>
+                <a
+                  href="https://www.apple.com/iphone-16/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md"
+                >
+                  Conoce más
+                </a>
+              </div>
+              <div className="w-40 h-32 relative">
+                <video
+                  className="w-full h-full object-cover rounded-lg"
+                  muted
+                  playsInline
+                  loop
+                  autoPlay
+                  preload="metadata"
+                  role="img"
+                  aria-label="iPhone 16 series showcasing front view of iPhone 16 pro, Action Button and Camera Control with dynamic abstract animation of iPhone 16 showing Ultramarine, Teal and Pink colors and ending the animation showcasing iPhone 16 Pro, iPhone 16 and iPhone 16e in White color."
+                >
+                  <source
+                    src="/105/media/us/iphone/family/2025/e7ff365a-cb59-4ce9-9cdf-4cb965455b69/anim/welcome/medium_2x.mp4#t=6.513572"
+                    type="video/mp4"
+                  />
+                  {/* Fallback image in case video doesn't load */}
+                  <Image
+                    src="https://images.unsplash.com/photo-1695048133142-1a20484403d8?q=80&w=2070&auto=format&fit=crop"
+                    alt="iPhone 16"
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </video>
+              </div>
             </div>
           </div>
         </div>
