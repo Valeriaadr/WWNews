@@ -21,7 +21,6 @@ import {
   Clock,
   Share2,
   Heart,
-  MessageCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -82,6 +81,8 @@ export default function LandingPage() {
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
   const [currentView, setCurrentView] = useState<"home" | "article">("home")
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null)
+  const [likedArticles, setLikedArticles] = useState<Set<number>>(new Set())
+  const [showShareModal, setShowShareModal] = useState(false)
 
   // Datos de categorías
   const categories: Category[] = [
@@ -2055,6 +2056,53 @@ export default function LandingPage() {
     return category ? category.color : "bg-gray-600"
   }
 
+  const handleLike = (articleId: number) => {
+    setLikedArticles((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(articleId)) {
+        newSet.delete(articleId)
+      } else {
+        newSet.add(articleId)
+      }
+      return newSet
+    })
+  }
+
+  const handleShare = (platform: string, article: NewsArticle) => {
+    const url = window.location.href
+    const title = article.title
+    const text = article.summary
+
+    switch (platform) {
+      case "facebook":
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank")
+        break
+      case "twitter":
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
+          "_blank",
+        )
+        break
+      case "whatsapp":
+        window.open(`https://wa.me/?text=${encodeURIComponent(title + " - " + url)}`, "_blank")
+        break
+      case "email":
+        window.open(
+          `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text + "\n\n" + url)}`,
+          "_blank",
+        )
+        break
+      case "linkedin":
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, "_blank")
+        break
+      case "copy":
+        navigator.clipboard.writeText(url)
+        alert("Enlace copiado al portapapeles")
+        break
+    }
+    setShowShareModal(false)
+  }
+
   // Vista de artículo individual
   if (currentView === "article" && selectedArticle) {
     const relatedArticles = getRelatedArticles(selectedArticle)
@@ -2151,11 +2199,12 @@ export default function LandingPage() {
             {/* Contenido del artículo */}
             <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-8 mb-8">
               <div
-                className="prose prose-invert prose-lg max-w-none"
+                className="prose prose-invert prose-lg max-w-none prose-headings:text-center prose-headings:text-white prose-headings:font-bold prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 prose-h4:text-lg prose-h4:mb-3 prose-h4:mt-4 prose-p:text-gray-200 prose-p:leading-relaxed prose-p:mb-4 prose-ul:text-gray-200 prose-ol:text-gray-200 prose-li:mb-2 prose-strong:text-white prose-strong:font-semibold"
                 dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
                 style={{
                   color: "#e2e8f0",
                   lineHeight: "1.7",
+                  textAlign: "justify",
                 }}
               />
             </div>
@@ -2164,21 +2213,99 @@ export default function LandingPage() {
             <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 mb-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-6">
-                  <button className="flex items-center gap-2 text-white hover:text-red-400 transition-colors">
-                    <Heart className="w-5 h-5" />
+                  <button
+                    onClick={() => handleLike(selectedArticle.id)}
+                    className={`flex items-center gap-2 transition-colors ${
+                      likedArticles.has(selectedArticle.id) ? "text-red-400" : "text-white hover:text-red-400"
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${likedArticles.has(selectedArticle.id) ? "fill-current" : ""}`} />
                     <span>Me gusta</span>
                   </button>
-                  <button className="flex items-center gap-2 text-white hover:text-blue-400 transition-colors">
-                    <MessageCircle className="w-5 h-5" />
-                    <span>Comentar</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-white hover:text-green-400 transition-colors">
+                  <button
+                    onClick={() => setShowShareModal(true)}
+                    className="flex items-center gap-2 text-white hover:text-green-400 transition-colors"
+                  >
                     <Share2 className="w-5 h-5" />
                     <span>Compartir</span>
                   </button>
                 </div>
               </div>
             </div>
+
+            {/* Modal de compartir */}
+            {showShareModal && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 max-w-md w-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-white">Compartir artículo</h3>
+                    <button onClick={() => setShowShareModal(false)} className="text-white hover:text-gray-300">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => handleShare("facebook", selectedArticle)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                    >
+                      <div className="w-5 h-5 bg-white rounded text-blue-600 flex items-center justify-center text-xs font-bold">
+                        f
+                      </div>
+                      Facebook
+                    </button>
+
+                    <button
+                      onClick={() => handleShare("twitter", selectedArticle)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-sky-500 hover:bg-sky-600 text-white transition-colors"
+                    >
+                      <div className="w-5 h-5 bg-white rounded text-sky-500 flex items-center justify-center text-xs font-bold">
+                        𝕏
+                      </div>
+                      Twitter
+                    </button>
+
+                    <button
+                      onClick={() => handleShare("whatsapp", selectedArticle)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors"
+                    >
+                      <div className="w-5 h-5 bg-white rounded text-green-600 flex items-center justify-center text-xs font-bold">
+                        W
+                      </div>
+                      WhatsApp
+                    </button>
+
+                    <button
+                      onClick={() => handleShare("email", selectedArticle)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition-colors"
+                    >
+                      <Mail className="w-5 h-5" />
+                      Email
+                    </button>
+
+                    <button
+                      onClick={() => handleShare("linkedin", selectedArticle)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-blue-700 hover:bg-blue-800 text-white transition-colors"
+                    >
+                      <div className="w-5 h-5 bg-white rounded text-blue-700 flex items-center justify-center text-xs font-bold">
+                        in
+                      </div>
+                      LinkedIn
+                    </button>
+
+                    <button
+                      onClick={() => handleShare("copy", selectedArticle)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors"
+                    >
+                      <div className="w-5 h-5 bg-white rounded text-purple-600 flex items-center justify-center text-xs font-bold">
+                        📋
+                      </div>
+                      Copiar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Artículos relacionados */}
             {relatedArticles.length > 0 && (
@@ -2417,8 +2544,7 @@ export default function LandingPage() {
                 Descubre los últimos avances en IA, gadgets y tecnología sin complicaciones. Noticias tech para todos,
                 explicadas en español claro y sencillo.
               </p>
-              <div className="flex justify-center">
-              </div>
+              <div className="flex justify-center"></div>
             </div>
           </div>
         </section>
