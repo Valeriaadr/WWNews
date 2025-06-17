@@ -2590,12 +2590,6 @@ export default function LandingPage() {
                     ? "Noticias Tech Destacadas"
                     : `${getCategoryName(selectedCategory)} Destacadas`}
                 </h2>
-                <button
-                  onClick={() => setShowAllNews(!showAllNews)}
-                  className="flex items-center text-blue-300 hover:text-blue-400"
-                >
-                  {showAllNews ? "Ver menos" : "Ver todas"} <ArrowRight className="ml-2 h-4 w-4" />
-                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
