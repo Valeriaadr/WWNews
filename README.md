@@ -3,7 +3,8 @@
 Sigue estos pasos en la terminal para iniciar el proyecto:
 
 # 1. Instala las dependencias del proyecto:
-npm install
+npm install --legacy-peer-deps
+
 
 # 2. Inicia el servidor de desarrollo:
 npm run dev
