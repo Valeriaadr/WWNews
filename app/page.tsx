@@ -21,9 +21,16 @@ import {
   Clock,
   Share2,
   Heart,
+  User,
+  LogOut,
+  Settings,
+  Eye,
+  EyeOff,
+  CheckCircle, // Nuevo ícono para éxito
+  XCircle, // Nuevo ícono para error
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button" // Asegúrate que esta ruta sea correcta para tu proyecto
+import { Input } from "@/components/ui/input" // Asegúrate que esta ruta sea correcta para tu proyecto
 
 // Tipos de datos
 interface NewsArticle {
@@ -38,6 +45,7 @@ interface NewsArticle {
   author: string
   readTime: string
   tags: string[]
+  likes: number
 }
 
 interface Category {
@@ -51,6 +59,35 @@ interface GoogleUser {
   name: string
   email: string
   picture?: string
+  id: string
+}
+
+interface AuthUser {
+  id: string
+  name: string
+  email: string
+  picture?: string
+  userType: "reader" | "premium" | "admin"
+  provider: "google" | "email"
+  createdAt: string
+  lastLogin: string
+}
+
+interface Comment {
+  id: number
+  articleId: number
+  userId: string
+  userName: string
+  userPicture?: string
+  text: string
+  timestamp: string
+}
+
+// Interfaz para el estado del toast/notificación
+interface Toast {
+  message: string
+  type: "success" | "error" | "info"
+  id: number
 }
 
 // Declarar tipos globales para Google Identity Services
@@ -69,7 +106,7 @@ declare global {
 }
 
 export default function LandingPage() {
-  // Estados
+  // Estados existentes
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -77,14 +114,47 @@ export default function LandingPage() {
   const [name, setName] = useState("")
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [showAllNews, setShowAllNews] = useState(false)
-  const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null)
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
   const [currentView, setCurrentView] = useState<"home" | "article">("home")
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null)
   const [likedArticles, setLikedArticles] = useState<Set<number>>(new Set())
   const [showShareModal, setShowShareModal] = useState(false)
 
-  // Datos de categorías
+  // Estados de autenticación
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authMode, setAuthMode] = useState<"login" | "register" | "forgot">("login")
+  const [authLoading, setAuthLoading] = useState(false)
+  const [authError, setAuthError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+
+  // Estados del formulario de autenticación (combinado)
+  const [authForm, setAuthForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    name: "",
+    userType: "reader" as "reader" | "premium" | "admin",
+  })
+
+  // Estados para comentarios
+  const [comments, setComments] = useState<Comment[]>([])
+  const [newCommentText, setNewCommentText] = useState("")
+
+  // NUEVO ESTADO para las notificaciones tipo toast
+  const [toasts, setToasts] = useState<Toast[]>([])
+
+  // Función para mostrar un toast
+  const showToast = (message: string, type: "success" | "error" | "info") => {
+    const id = Date.now()
+    setToasts((prevToasts) => [...prevToasts, { message, type, id }])
+    setTimeout(() => {
+      setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id))
+    }, 5000) // Desaparece después de 5 segundos
+  }
+
+  // Datos de categorías (sin cambios)
   const categories: Category[] = [
     { id: "ia", name: "IA Simple", icon: Brain, color: "bg-blue-600" },
     { id: "smartphones", name: "Smartphones", icon: Smartphone, color: "bg-gray-600" },
@@ -94,7 +164,7 @@ export default function LandingPage() {
     { id: "tutoriales", name: "Tutoriales", icon: BookOpen, color: "bg-green-600" },
   ]
 
-  // Datos de noticias con contenido completo
+  // Datos de noticias con contenido completo (añadido el campo 'likes')
   const [allNews] = useState<NewsArticle[]>([
     {
       id: 1,
@@ -144,6 +214,7 @@ export default function LandingPage() {
         
         <p><strong>Conclusión:</strong> ChatGPT es una herramienta increíblemente útil que puede ahorrarte tiempo y ayudarte a ser más productivo. Lo mejor es que no necesitas ser un experto en tecnología para usarlo. ¡Solo empieza a conversar con él como lo harías con un amigo muy inteligente!</p>
       `,
+      likes: 10,
     },
     {
       id: 2,
@@ -203,6 +274,7 @@ export default function LandingPage() {
         
         <p><strong>Consejo final:</strong> Si tu teléfono actual funciona bien para tus necesidades diarias, no hay prisa por cambiar. La tecnología siempre mejora, pero eso no significa que necesites lo último. Evalúa si las mejoras realmente solucionan problemas que tienes actualmente.</p>
       `,
+      likes: 15,
     },
     {
       id: 3,
@@ -323,6 +395,7 @@ export default function LandingPage() {
         
         <p><strong>Recuerda:</strong> La seguridad digital no es perfecta, pero estos pasos simples te protegerán del 95% de los problemas comunes. No necesitas ser un experto, solo ser consistente con estos hábitos básicos.</p>
       `,
+      likes: 7,
     },
     {
       id: 4,
@@ -463,6 +536,7 @@ export default function LandingPage() {
         
         <p><strong>Conclusión:</strong> La Realidad Virtual ya no es solo para gamers. Es una herramienta poderosa que está transformando la educación, el trabajo, la salud y el entretenimiento. Aunque aún tiene limitaciones, la tecnología mejora rápidamente y cada vez es más accesible para el usuario promedio.</p>
       `,
+      likes: 22,
     },
     {
       id: 5,
@@ -479,9 +553,6 @@ export default function LandingPage() {
       content: `
         <h2>Bitcoin: La moneda digital que todos mencionan</h2>
         <p>Si has escuchado hablar de Bitcoin pero no entiendes qué es exactamente, esta guía te lo explicará de forma simple y sin tecnicismos complicados.</p>
-        
-        <h3>¿Qué es Bitcoin exactamente?</h3>
-        <p>Bitcoin es dinero digital. Imagina que en lugar de tener billetes físicos en tu cartera, tienes "monedas digitales" en tu teléfono o computadora. Pero a diferencia del dinero tradicional, Bitcoin no está controlado por ningún banco o gobierno.</p>
         
         <h4>Analogía simple:</h4>
         <p>Piensa en Bitcoin como el oro digital. Así como el oro es valioso porque es escaso y la gente confía en él, Bitcoin es valioso porque:</p>
@@ -629,6 +700,7 @@ export default function LandingPage() {
         
         <p><strong>Conclusión:</strong> Bitcoin es una tecnología fascinante con potencial, pero también con riesgos significativos. Si decides invertir, hazlo de forma responsable, con dinero que puedes permitirte perder, y siempre como parte de una estrategia de inversión diversificada. La clave está en educarse primero y nunca invertir más de lo que puedes permitirte perder.</p>
       `,
+      likes: 38,
     },
     {
       id: 6,
@@ -840,6 +912,7 @@ export default function LandingPage() {
         
         <p><strong>Consejo final:</strong> No hay una respuesta única. La mejor plataforma depende de tus gustos, presupuesto y situación familiar. Empieza con una, úsala por unos meses, y ajusta según tus necesidades. Recuerda que siempre puedes cambiar: no es un compromiso de por vida.</p>
       `,
+      likes: 25,
     },
     {
       id: 7,
@@ -1155,6 +1228,7 @@ export default function LandingPage() {
         
         <p><strong>Conclusión:</strong> Trabajar desde casa exitosamente requiere las herramientas correctas, un espacio bien configurado y buenos hábitos. No necesitas comprar todo de una vez; empieza con lo básico y ve mejorando gradualmente. La inversión en tu home office es una inversión en tu productividad, salud y bienestar a largo plazo.</p>
       `,
+      likes: 42,
     },
     {
       id: 8,
@@ -1170,8 +1244,6 @@ export default function LandingPage() {
       content: `
         <h2>La batalla de la mensajería segura: WhatsApp vs Telegram</h2>
         <p>Ambas aplicaciones prometen seguridad, pero ¿cuál protege mejor tu privacidad? Te explicamos las diferencias de forma simple.</p>
-        
-        <h3>WhatsApp: Seguridad por defecto</h3>
         
         <h4>Cifrado de extremo a extremo</h4>
         <p><strong>¿Qué significa?</strong> Tus mensajes se "codifican" de tal manera que solo tú y la persona que recibe el mensaje pueden leerlos. Ni WhatsApp, ni Facebook, ni hackers pueden ver el contenido.</p>
@@ -1362,6 +1434,7 @@ export default function LandingPage() {
         
         <p><strong>Conclusión:</strong> Tanto WhatsApp como Telegram pueden ser seguros si los usas correctamente. WhatsApp es mejor para la mayoría de usuarios porque la seguridad está activada por defecto. Telegram ofrece más control y funciones avanzadas, pero requiere más conocimiento para usarlo de forma segura. Para máxima seguridad, considera Signal. Lo más importante es entender las limitaciones de cada plataforma y configurarlas apropiadamente para tus necesidades.</p>
       `,
+      likes: 31,
     },
     {
       id: 9,
@@ -1470,148 +1543,149 @@ export default function LandingPage() {
           <td style="padding: 8px; border: 1px solid #ddd;">$799 USD</td>
           <td style="padding: 8px; border: 1px solid #ddd;">$799 USD</td>
         </tr>
-      </table>
-      
-      <h3>¿Deberías actualizar?</h3>
-      
-      <h4>SÍ, actualiza si tienes:</h4>
-      <ul>
-        <li><strong>Galaxy S21 o anterior:</strong> Notarás mejoras significativas</li>
-        <li><strong>Un teléfono con problemas de batería:</strong> El S24 tiene mejor eficiencia</li>
-        <li><strong>Necesidades de cámara profesional:</strong> Las mejoras en foto/video son notables</li>
-        <li><strong>Uso intensivo de IA:</strong> Las funciones nuevas pueden ser muy útiles</li>
-        <li><strong>Problemas de rendimiento:</strong> El nuevo procesador es mucho más rápido</li>
-      </ul>
-      
-      <h4>NO actualices si tienes:</h4>
-      <ul>
-        <li><strong>Galaxy S23:</strong> Las mejoras son incrementales</li>
-        <li><strong>Presupuesto ajustado:</strong> El S23 sigue siendo excelente y ahora más barato</li>
-        <li><strong>Tu teléfono actual funciona bien:</strong> No hay urgencia real</li>
-        <li><strong>No usas funciones avanzadas:</strong> Para uso básico, no justifica el costo</li>
-      </ul>
-      
-      <h3>Comparación con la competencia</h3>
-      
-      <h4>Galaxy S24 vs iPhone 15</h4>
-      <ul>
-        <li><strong>Cámara:</strong> Empate, ambos excelentes con fortalezas diferentes</li>
-        <li><strong>Rendimiento:</strong> iPhone ligeramente superior en benchmarks</li>
-        <li><strong>IA:</strong> Galaxy S24 tiene más funciones de IA integradas</li>
-        <li><strong>Personalización:</strong> Android permite más customización</li>
-        <li><strong>Ecosistema:</strong> iPhone mejor si tienes otros productos Apple</li>
-        <li><strong>Precio:</strong> Similar, pero Galaxy ofrece más opciones de almacenamiento</li>
-      </ul>
-      
-      <h4>Galaxy S24 vs Google Pixel 8</h4>
-      <ul>
-        <li><strong>IA:</strong> Pixel tiene ventaja en procesamiento de fotos con IA</li>
-        <li><strong>Android puro:</strong> Pixel recibe actualizaciones más rápido</li>
-        <li><strong>Hardware:</strong> Galaxy S24 tiene mejor pantalla y construcción</li>
-        <li><strong>Precio:</strong> Pixel 8 generalmente más barato</li>
-        <li><strong>Soporte:</strong> Pixel promete 7 años de actualizaciones</li>
-      </ul>
-      
-      <h3>Precios y disponibilidad</h3>
-      
-      <h4>Precios de lanzamiento (USD):</h4>
-      <ul>
-        <li><strong>Galaxy S24 (128GB):</strong> $799</li>
-        <li><strong>Galaxy S24+ (256GB):</strong> $999</li>
-        <li><strong>Galaxy S24 Ultra (256GB):</strong> $1,299</li>
-      </ul>
-      
-      <h4>¿Cuál elegir?</h4>
-      <ul>
-        <li><strong>S24 básico:</strong> Para la mayoría de usuarios, excelente relación calidad-precio</li>
-        <li><strong>S24+:</strong> Si quieres pantalla más grande y mejor batería</li>
-        <li><strong>S24 Ultra:</strong> Para usuarios power que necesitan S Pen y la mejor cámara</li>
-      </ul>
-      
-      <h3>Funciones de IA en detalle</h3>
-      
-      <h4>Live Translate (Traducción en vivo)</h4>
-      <p><strong>Cómo funciona:</strong> Durante una llamada, el teléfono traduce en tiempo real lo que dice la otra persona y lo que dices tú.</p>
-      <p><strong>Idiomas soportados:</strong> 13 idiomas inicialmente, incluyendo español, inglés, francés, alemán, etc.</p>
-      <p><strong>¿Es útil?</strong> Muy útil para viajes de negocios o comunicación internacional.</p>
-      
-      <h4>Circle to Search</h4>
-      <p><strong>Cómo funciona:</strong> Mantén presionado el botón de inicio, encierra cualquier objeto en la pantalla, y Google lo buscará automáticamente.</p>
-      <p><strong>Casos de uso:</strong> Identificar plantas, buscar productos, traducir texto en imágenes.</p>
-      
-      <h4>Photo Assist</h4>
-      <p><strong>Funciones:</strong></p>
-      <ul>
-        <li>Eliminar objetos no deseados de fotos</li>
-        <li>Mover objetos dentro de la foto</li>
-        <li>Mejorar resolución de imágenes</li>
-        <li>Cambiar fondos automáticamente</li>
-      </ul>
-      
-      <h3>Problemas y limitaciones</h3>
-      
-      <h4>Aspectos negativos:</h4>
-      <ul>
-        <li><strong>Precio alto:</strong> Sigue siendo caro para muchos presupuestos</li>
-        <li><strong>IA requiere internet:</strong> Muchas funciones de IA necesitan conexión</li>
-        <li><strong>Bloatware:</strong> Samsung incluye muchas apps preinstaladas</li>
-        <li><strong>Actualizaciones lentas:</strong> Android puro (Pixel) recibe actualizaciones más rápido</li>
-        <li><strong>Carga lenta:</strong> 45W es bueno pero no el más rápido del mercado</li>
-      </ul>
-      
-      <h4>Problemas reportados por usuarios:</h4>
-      <ul>
-        <li>Algunos problemas menores de software en el lanzamiento</li>
-        <li>La IA a veces comete errores en traducciones</li>
-        <li>Calentamiento durante uso muy intensivo</li>
-        <li>Duración de batería variable según uso de IA</li>
-      </ul>
-      
-      <h3>Alternativas a considerar</h3>
-      
-      <h4>Si el S24 es muy caro:</h4>
-      <ul>
-        <li><strong>Galaxy S23:</strong> Ahora más barato, sigue siendo excelente</li>
-        <li><strong>Galaxy A54:</strong> Gama media con muchas funciones del S24</li>
-        <li><strong>Google Pixel 7a:</strong> Excelente cámara a menor precio</li>
-        <li><strong>OnePlus 12:</strong> Rendimiento similar, precio más bajo</li>
-      </ul>
-      
-      <h4>Si quieres algo diferente:</h4>
-      <ul>
-        <li><strong>iPhone 15:</strong> Si prefieres iOS</li>
-        <li><strong>Google Pixel 8:</strong> Para Android puro y mejor IA fotográfica</li>
-        <li><strong>Xiaomi 14:</strong> Especificaciones similares, precio más bajo</li>
-      </ul>
-      
-      <h3>Consejos para la compra</h3>
-      
-      <h4>Cuándo comprar:</h4>
-      <ul>
-        <li><strong>Inmediatamente:</strong> Si necesitas un teléfono nuevo urgentemente</li>
-        <li><strong>En 3-6 meses:</strong> Para evitar problemas iniciales de software</li>
-        <li><strong>Black Friday/Cyber Monday:</strong> Para mejores descuentos</li>
-        <li><strong>Cuando salga el S25:</strong> El S24 bajará de precio</li>
-      </ul>
-      
-      <h4>Dónde comprar:</h4>
-      <ul>
-        <li><strong>Samsung directamente:</strong> Mejores ofertas de trade-in</li>
-        <li><strong>Operadoras:</strong> Planes de financiamiento</li>
-        <li><strong>Retailers:</strong> Amazon, Best Buy para comparar precios</li>
-        <li><strong>Costco/Sam's:</strong> A veces incluyen accesorios gratis</li>
-      </ul>
-      
-      <h4>Accesorios recomendados:</h4>
-      <ul>
-        <li><strong>Funda:</strong> Protección esencial ($20-50 USD)</li>
-        <li><strong>Protector de pantalla:</strong> Cristal templado ($10-30 USD)</li>
-        <li><strong>Cargador inalámbrico:</strong> Para aprovechar la carga rápida ($30-60 USD)</li>
-        <li><strong>Galaxy Buds:</strong> Integración perfecta con el teléfono ($100-200 USD)</li>
-      </ul>
-      
-      <p><strong>Conclusión:</strong> El Galaxy S24 es una evolución sólida con mejoras reales en IA, cámara y eficiencia. Si tienes un teléfono de 2-3 años o más, la actualización vale la pena. Si tienes un S23 o teléfono reciente de gama alta, las mejoras son incrementales. Las funciones de IA son impresionantes pero no revolucionarias. Para la mayoría de usuarios, el S24 básico ofrece la mejor relación calidad-precio de la serie.</p>
-    `,
+        </table>
+        
+        <h3>¿Deberías actualizar?</h3>
+        
+        <h4>SÍ, actualiza si tienes:</h4>
+        <ul>
+          <li><strong>Galaxy S21 o anterior:</strong> Notarás mejoras significativas</li>
+          <li><strong>Un teléfono con problemas de batería:</strong> El S24 tiene mejor eficiencia</li>
+          <li><strong>Necesidades de cámara profesional:</strong> Las mejoras en foto/video son notables</li>
+          <li><strong>Uso intensivo de IA:</strong> Las funciones nuevas pueden ser muy útiles</li>
+          <li><strong>Problemas de rendimiento:</strong> El nuevo procesador es mucho más rápido</li>
+        </ul>
+        
+        <h4>NO actualices si tienes:</h4>
+        <ul>
+          <li><strong>Galaxy S23:</strong> Las mejoras son incrementales</li>
+          <li><strong>Presupuesto ajustado:</strong> El S23 sigue siendo excelente y ahora más barato</li>
+          <li><strong>Tu teléfono actual funciona bien:</strong> No hay urgencia real</li>
+          <li><strong>No usas funciones avanzadas:</strong> Para uso básico, no justifica el costo</li>
+        </ul>
+        
+        <h3>Comparación con la competencia</h3>
+        
+        <h4>Galaxy S24 vs iPhone 15</h4>
+        <ul>
+          <li><strong>Cámara:</strong> Empate, ambos excelentes con fortalezas diferentes</li>
+          <li><strong>Rendimiento:</strong> iPhone ligeramente superior en benchmarks</li>
+          <li><strong>IA:</strong> Galaxy S24 tiene más funciones de IA integradas</li>
+          <li><strong>Personalización:</strong> Android permite más customización</li>
+          <li><strong>Ecosistema:</strong> iPhone mejor si tienes otros productos Apple</li>
+          <li><strong>Precio:</strong> Similar, pero Galaxy ofrece más opciones de almacenamiento</li>
+        </ul>
+        
+        <h4>Galaxy S24 vs Google Pixel 8</h4>
+        <ul>
+          <li><strong>IA:</strong> Pixel tiene ventaja en procesamiento de fotos con IA</li>
+          <li><strong>Android puro:</strong> Pixel recibe actualizaciones más rápido</li>
+          <li><strong>Hardware:</strong> Galaxy S24 tiene mejor pantalla y construcción</li>
+          <li><strong>Precio:</strong> Pixel 8 generalmente más barato</li>
+          <li><strong>Soporte:</strong> Pixel promete 7 años de actualizaciones</li>
+        </ul>
+        
+        <h3>Precios y disponibilidad</h3>
+        
+        <h4>Precios de lanzamiento (USD):</h4>
+        <ul>
+          <li><strong>Galaxy S24 (128GB):</strong> $799</li>
+          <li><strong>Galaxy S24+ (256GB):</strong> $999</li>
+          <li><strong>Galaxy S24 Ultra (256GB):</strong> $1,299</li>
+        </ul>
+        
+        <h4>¿Cuál elegir?</h4>
+        <ul>
+          <li><strong>S24 básico:</strong> Para la mayoría de usuarios, excelente relación calidad-precio</li>
+          <li><strong>S24+:</strong> Si quieres pantalla más grande y mejor batería</li>
+          <li><strong>S24 Ultra:</strong> Para usuarios power que necesitan S Pen y la mejor cámara</li>
+        </ul>
+        
+        <h3>Funciones de IA en detalle</h3>
+        
+        <h4>Live Translate (Traducción en vivo)</h4>
+        <p><strong>Cómo funciona:</strong> Durante una llamada, el teléfono traduce en tiempo real lo que dice la otra persona y lo que dices tú.</p>
+        <p><strong>Idiomas soportados:</strong> 13 idiomas inicialmente, incluyendo español, inglés, francés, alemán, etc.</p>
+        <p><strong>¿Es útil?</strong> Muy útil para viajes de negocios o comunicación internacional.</p>
+        
+        <h4>Circle to Search</h4>
+        <p><strong>Cómo funciona:</strong> Mantén presionado el botón de inicio, encierra cualquier objeto en la pantalla, y Google lo buscará automáticamente.</p>
+        <p><strong>Casos de uso:</strong> Identificar plantas, buscar productos, traducir texto en imágenes.</p>
+        
+        <h4>Photo Assist</h4>
+        <p><strong>Funciones:</strong></p>
+        <ul>
+          <li>Eliminar objetos no deseados de fotos</li>
+          <li>Mover objetos dentro de la foto</li>
+          <li>Mejorar resolución de imágenes</li>
+          <li>Cambiar fondos automáticamente</li>
+        </ul>
+        
+        <h3>Problemas y limitaciones</h3>
+        
+        <h4>Aspectos negativos:</h4>
+        <ul>
+          <li><strong>Precio alto:</strong> Sigue siendo caro para muchos presupuestos</li>
+          <li><strong>IA requiere internet:</strong> Muchas funciones de IA necesitan conexión</li>
+          <li><strong>Bloatware:</strong> Samsung incluye muchas apps preinstaladas</li>
+          <li><strong>Actualizaciones lentas:</strong> Android puro (Pixel) recibe actualizaciones más rápido</li>
+          <li><strong>Carga lenta:</strong> 45W es bueno pero no el más rápido del mercado</li>
+        </ul>
+        
+        <h4>Problemas reportados por usuarios:</h4>
+        <ul>
+          <li>Algunos problemas menores de software en el lanzamiento</li>
+          <li>La IA a veces comete errores en traducciones</li>
+          <li>Calentamiento durante uso muy intensivo</li>
+          <li>Duración de batería variable según uso de IA</li>
+        </ul>
+        
+        <h3>Alternativas a considerar</h3>
+        
+        <h4>Si el S24 es muy caro:</h4>
+        <ul>
+          <li><strong>Galaxy S23:</strong> Ahora más barato, sigue siendo excelente</li>
+          <li><strong>Galaxy A54:</strong> Gama media con muchas funciones del S24</li>
+          <li><strong>Google Pixel 7a:</strong> Excelente cámara a menor precio</li>
+          <li><strong>OnePlus 12:</strong> Rendimiento similar, precio más bajo</li>
+        </ul>
+        
+        <h4>Si quieres algo diferente:</h4>
+        <ul>
+          <li><strong>iPhone 15:</strong> Si prefieres iOS</li>
+          <li><strong>Google Pixel 8:</strong> Para Android puro y mejor IA fotográfica</li>
+          <li><strong>Xiaomi 14:</strong> Especificaciones similares, precio más bajo</li>
+        </ul>
+        
+        <h3>Consejos para la compra</h3>
+        
+        <h4>Cuándo comprar:</h4>
+        <ul>
+          <li><strong>Inmediatamente:</strong> Si necesitas un teléfono nuevo urgentemente</li>
+          <li><strong>En 3-6 meses:</strong> Para evitar problemas iniciales de software</li>
+          <li><strong>Black Friday/Cyber Monday:</strong> Para mejores descuentos</li>
+          <li><strong>Cuando salga el S25:</strong> El S24 bajará de precio</li>
+        </ul>
+        
+        <h4>Dónde comprar:</h4>
+        <ul>
+          <li><strong>Samsung directamente:</strong> Mejores ofertas de trade-in</li>
+          <li><strong>Operadoras:</strong> Planes de financiamiento</li>
+          <li><strong>Retailers:</strong> Amazon, Best Buy para comparar precios</li>
+          <li><strong>Costco/Sam's:</strong> A veces incluyen accesorios gratis</li>
+        </ul>
+        
+        <h4>Accesorios recomendados:</h4>
+        <ul>
+          <li><strong>Funda:</strong> Protección esencial ($20-50 USD)</li>
+          <li><strong>Protector de pantalla:</strong> Cristal templado ($10-30 USD)</li>
+          <li><strong>Cargador inalámbrico:</strong> Para aprovechar la carga rápida ($30-60 USD)</li>
+          <li><strong>Galaxy Buds:</strong> Integración perfecta con el teléfono ($100-200 USD)</li>
+        </ul>
+        
+        <p><strong>Conclusión:</strong> El Galaxy S24 es una evolución sólida con mejoras reales en IA, cámara y eficiencia. Si tienes un teléfono de 2-3 años o más, la actualización vale la pena. Si tienes un S23 o teléfono reciente de gama alta, las mejoras son incrementales. Las funciones de IA son impresionantes pero no revolucionarias. Para la mayoría de usuarios, el S24 básico ofrece la mejor relación calidad-precio de la serie.</p>
+      `,
+      likes: 45,
     },
     {
       id: 10,
@@ -1895,6 +1969,7 @@ export default function LandingPage() {
         
         <p><strong>Conclusión:</strong> La IA ha democratizado la edición de fotos, permitiendo que cualquiera pueda mejorar sus imágenes sin conocimientos técnicos. Las herramientas gratuitas disponibles son sorprendentemente poderosas y fáciles de usar. Sin embargo, la clave está en usarlas como complemento a tu creatividad, no como reemplazo. Experimenta con diferentes aplicaciones, aprende qué funciona mejor para tus necesidades, y recuerda que la mejor foto editada es aquella que mejora la original sin perder su esencia natural.</p>
       `,
+      likes: 50,
     },
   ])
 
@@ -1918,7 +1993,6 @@ export default function LandingPage() {
       if (window.google) {
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
-        // Validar que el Client ID esté configurado
         if (!clientId || clientId === "YOUR_GOOGLE_CLIENT_ID") {
           console.warn(
             "Google Client ID no configurado. Por favor configura NEXT_PUBLIC_GOOGLE_CLIENT_ID en tu archivo .env.local",
@@ -1939,31 +2013,56 @@ export default function LandingPage() {
     loadGoogleScript()
   }, [])
 
-  // Manejar respuesta de Google
+  // Cargar sesión guardada al iniciar (persistir sesión)
+  useEffect(() => {
+    const savedUser = localStorage.getItem("currentUser")
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser)
+        setCurrentUser(user)
+        setName(user.name || "")
+        setEmail(user.email || "")
+      } catch (error) {
+        console.error("Error cargando usuario guardado:", error)
+        localStorage.removeItem("currentUser")
+      }
+    }
+  }, [])
+
+  // Manejar respuesta de Google (actualizado para autenticación completa)
   const handleGoogleResponse = (response: any) => {
     try {
-      // Decodificar el JWT token de Google
       const payload = JSON.parse(atob(response.credential.split(".")[1]))
-      const userData: GoogleUser = {
+      const userData: AuthUser = {
+        id: payload.sub,
         name: payload.name,
         email: payload.email,
         picture: payload.picture,
+        userType: "reader",
+        provider: "google",
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
       }
 
-      setGoogleUser(userData)
+      setCurrentUser(userData)
+      localStorage.setItem("currentUser", JSON.stringify(userData))
+      setShowAuthModal(false)
+      setAuthError("")
       setName(userData.name)
       setEmail(userData.email)
+      showToast("¡Has iniciado sesión con Google exitosamente! 🎉", "success")
     } catch (error) {
       console.error("Error al procesar la respuesta de Google:", error)
+      setAuthError("Error al iniciar sesión con Google. Inténtalo de nuevo.")
+      showToast("Error al iniciar sesión con Google. Inténtalo de nuevo.", "error")
     }
   }
 
-  // Renderizar botón de Google
+  // Renderizar botón de Google en el modal (useEffect)
   useEffect(() => {
-    if (isGoogleLoaded && !googleUser) {
-      const googleButtonElement = document.getElementById("google-signin-button")
+    if (isGoogleLoaded && showAuthModal && !currentUser) {
+      const googleButtonElement = document.getElementById("google-signin-modal")
       if (googleButtonElement && window.google) {
-        // Limpiar el contenido anterior
         googleButtonElement.innerHTML = ""
         window.google.accounts.id.renderButton(googleButtonElement, {
           theme: "filled_blue",
@@ -1975,9 +2074,162 @@ export default function LandingPage() {
         })
       }
     }
-  }, [isGoogleLoaded, googleUser])
+  }, [isGoogleLoaded, showAuthModal, currentUser])
 
-  // Filtrar noticias
+  // Funciones de autenticación
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAuthLoading(true)
+    setAuthError("")
+
+    try {
+      if (authMode === "register") {
+        if (authForm.password !== authForm.confirmPassword) {
+          setAuthError("Las contraseñas no coinciden.")
+          showToast("Error de registro: Las contraseñas no coinciden.", "error")
+          return
+        }
+        if (authForm.password.length < 6) {
+          setAuthError("La contraseña debe tener al menos 6 caracteres.")
+          showToast("Error de registro: La contraseña debe tener al menos 6 caracteres.", "error")
+          return
+        }
+        if (!authForm.name.trim()) {
+          setAuthError("El nombre es requerido para el registro.")
+          showToast("Error de registro: El nombre es requerido.", "error")
+          return
+        }
+
+        const newUser: AuthUser = {
+          id: Date.now().toString(),
+          name: authForm.name,
+          email: authForm.email,
+          userType: authForm.userType,
+          provider: "email",
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        }
+
+        setCurrentUser(newUser)
+        localStorage.setItem("currentUser", JSON.stringify(newUser))
+        setShowAuthModal(false)
+        resetAuthForm()
+        setName(newUser.name)
+        setEmail(newUser.email)
+        showToast("¡Cuenta creada exitosamente! Has iniciado sesión. 🎉", "success")
+      } else if (authMode === "login") {
+        if (authForm.email === "test@example.com" && authForm.password === "password") {
+          const user: AuthUser = {
+            id: "user-123",
+            name: "Usuario Demo",
+            email: "test@example.com",
+            userType: "reader",
+            provider: "email",
+            createdAt: "2023-01-01T00:00:00Z",
+            lastLogin: new Date().toISOString(),
+          }
+          setCurrentUser(user)
+          localStorage.setItem("currentUser", JSON.stringify(user))
+          setShowAuthModal(false)
+          resetAuthForm()
+          setName(user.name)
+          setEmail(user.email)
+          showToast("¡Inicio de sesión exitoso! Bienvenido de nuevo. 👋", "success")
+        } else {
+          setAuthError("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+          showToast("Error de inicio de sesión: Credenciales incorrectas.", "error")
+        }
+      } else if (authMode === "forgot") {
+        showToast(`Se ha enviado un email de recuperación a ${authForm.email}. Revisa tu bandeja. 📧`, "info")
+        setAuthMode("login")
+        resetAuthForm()
+      }
+    } catch (error: any) {
+      setAuthError(error.message || "Ha ocurrido un error inesperado. Inténtalo de nuevo.")
+      showToast(error.message || "Error inesperado durante la autenticación.", "error")
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const resetAuthForm = () => {
+    setAuthForm({
+      email: "",
+      password: "",
+      confirmPassword: "",
+      name: "",
+      userType: "reader",
+    })
+    setAuthError("")
+  }
+
+  const handleLogout = () => {
+    setCurrentUser(null)
+    localStorage.removeItem("currentUser")
+    setShowUserMenu(false)
+    setName("")
+    setEmail("")
+    showToast("Has cerrado sesión. ¡Vuelve pronto! 👋", "info")
+  }
+
+  const getUserTypeLabel = (userType: string) => {
+    switch (userType) {
+      case "reader":
+        return "Lector"
+      case "premium":
+        return "Premium"
+      case "admin":
+        return "Administrador"
+      default:
+        return "Usuario"
+    }
+  }
+
+  const getUserTypeColor = (userType: string) => {
+    switch (userType) {
+      case "reader":
+        return "bg-blue-600"
+      case "premium":
+        return "bg-yellow-600"
+      case "admin":
+        return "bg-red-600"
+      default:
+        return "bg-gray-600"
+    }
+  }
+
+  // Lógica para añadir un comentario
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!currentUser) {
+      showToast("Debes iniciar sesión para comentar. Por favor, regístrate o inicia sesión.", "error")
+      return
+    }
+    if (!selectedArticle) {
+      showToast("No hay artículo seleccionado para comentar.", "error")
+      return
+    }
+    if (newCommentText.trim() === "") {
+      showToast("El comentario no puede estar vacío.", "error")
+      return
+    }
+
+    const newComment: Comment = {
+      id: comments.length + 1,
+      articleId: selectedArticle.id,
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userPicture: currentUser.picture,
+      text: newCommentText.trim(),
+      timestamp: new Date().toISOString(),
+    }
+
+    setComments((prevComments) => [...prevComments, newComment])
+    setNewCommentText("")
+    showToast("¡Comentario publicado exitosamente! ✅", "success")
+  }
+
+  // Filtrar noticias (sin cambios)
   const filteredNews = allNews.filter((article) => {
     const matchesSearch =
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1990,47 +2242,37 @@ export default function LandingPage() {
   const recentNews = filteredNews.filter((article) => !article.featured)
   const displayedRecentNews = showAllNews ? recentNews : recentNews.slice(0, 4)
 
-  // Funciones
+  // Funciones existentes (sin cambios)
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // La búsqueda se actualiza automáticamente con el estado
   }
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId)
-    setSearchTerm("") // Limpiar búsqueda al cambiar categoría
-    setCurrentView("home") // Asegurar que regresamos a la vista principal
+    setSearchTerm("")
+    setCurrentView("home")
   }
 
   const handleSubscription = (e: React.FormEvent) => {
     e.preventDefault()
     if (email && name) {
       setIsSubscribed(true)
+      showToast("¡Gracias por suscribirte al newsletter! 💌", "success")
       setTimeout(() => {
         setIsSubscribed(false)
-        setEmail("")
-        setName("")
-        setGoogleUser(null)
+        if (!currentUser) {
+          setEmail("")
+          setName("")
+        }
       }, 3000)
+    } else {
+        showToast("Por favor, completa tu nombre y correo para suscribirte.", "error");
     }
-  }
-
-  const handleGoogleSignIn = () => {
-    if (window.google) {
-      window.google.accounts.id.prompt()
-    }
-  }
-
-  const handleLogoutGoogle = () => {
-    setGoogleUser(null)
-    setName("")
-    setEmail("")
   }
 
   const handleReadMore = (article: NewsArticle) => {
     setSelectedArticle(article)
     setCurrentView("article")
-    // Scroll to top
     window.scrollTo(0, 0)
   }
 
@@ -2061,8 +2303,10 @@ export default function LandingPage() {
       const newSet = new Set(prev)
       if (newSet.has(articleId)) {
         newSet.delete(articleId)
+        showToast("¡Te ha dejado de gustar este artículo! 💔", "info");
       } else {
         newSet.add(articleId)
+        showToast("¡Te gusta este artículo! ❤️", "success");
       }
       return newSet
     })
@@ -2097,15 +2341,16 @@ export default function LandingPage() {
         break
       case "copy":
         navigator.clipboard.writeText(url)
-        alert("Enlace copiado al portapapeles")
+        showToast("Enlace copiado al portapapeles. ¡Compártelo! 📋", "success");
         break
     }
     setShowShareModal(false)
   }
 
-  // Vista de artículo individual
+  // Vista de artículo individual (con sección de comentarios)
   if (currentView === "article" && selectedArticle) {
     const relatedArticles = getRelatedArticles(selectedArticle)
+    const articleComments = comments.filter((comment) => comment.articleId === selectedArticle.id)
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-gray-900 bg-fixed">
@@ -2132,11 +2377,19 @@ export default function LandingPage() {
               </button>
 
               <div className="flex items-center gap-4">
-                <button className="text-white hover:text-blue-300 transition-colors">
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="text-white hover:text-blue-300 transition-colors"
+                >
                   <Share2 className="w-5 h-5" />
                 </button>
-                <button className="text-white hover:text-blue-300 transition-colors">
-                  <Heart className="w-5 h-5" />
+                <button
+                  onClick={() => handleLike(selectedArticle.id)}
+                  className={`transition-colors ${
+                    likedArticles.has(selectedArticle.id) ? "text-red-400" : "text-white hover:text-red-400"
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 ${likedArticles.has(selectedArticle.id) ? "fill-current" : ""}`} />
                 </button>
               </div>
             </div>
@@ -2220,7 +2473,7 @@ export default function LandingPage() {
                     }`}
                   >
                     <Heart className={`w-5 h-5 ${likedArticles.has(selectedArticle.id) ? "fill-current" : ""}`} />
-                    <span>Me gusta</span>
+                    <span>{selectedArticle.likes} Me gusta</span>
                   </button>
                   <button
                     onClick={() => setShowShareModal(true)}
@@ -2306,6 +2559,93 @@ export default function LandingPage() {
                 </div>
               </div>
             )}
+            {/* Sección de Comentarios */}
+            <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-8 mb-8">
+              <h3 className="text-2xl font-bold text-white mb-6">Comentarios</h3>
+
+              {/* Formulario para añadir comentario */}
+              {currentUser ? (
+                <form onSubmit={handleAddComment} className="mb-8 p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex items-center gap-3 mb-4">
+                    {currentUser.picture ? (
+                      <img src={currentUser.picture} alt={currentUser.name} className="w-10 h-10 rounded-full" />
+                    ) : (
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                        {currentUser.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <p className="text-white font-medium">{currentUser.name}</p>
+                  </div>
+                  <textarea
+                    className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[80px]"
+                    placeholder="Escribe tu comentario aquí..."
+                    value={newCommentText}
+                    onChange={(e) => setNewCommentText(e.target.value)}
+                  ></textarea>
+                  <Button type="submit" className="mt-4 bg-blue-600 hover:bg-blue-700 text-white">
+                    Publicar Comentario
+                  </Button>
+                </form>
+              ) : (
+                <div className="text-center p-6 bg-white/5 rounded-lg border border-white/10 mb-8">
+                  <p className="text-gray-300 mb-4">
+                    ¡Únete a la conversación!{" "}
+                    <button
+                      onClick={() => {
+                        setAuthMode("login")
+                        setShowAuthModal(true)
+                        resetAuthForm()
+                      }}
+                      className="text-blue-300 hover:text-blue-400 underline"
+                    >
+                      Inicia sesión
+                    </button>{" "}
+                    o{" "}
+                    <button
+                      onClick={() => {
+                        setAuthMode("register")
+                        setShowAuthModal(true)
+                        resetAuthForm()
+                      }}
+                      className="text-blue-300 hover:text-blue-400 underline"
+                    >
+                      regístrate
+                    </button>{" "}
+                    para comentar.
+                  </p>
+                </div>
+              )}
+
+              {/* Lista de comentarios */}
+              {articleComments.length > 0 ? (
+                <div className="space-y-6">
+                  {articleComments
+                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) // Más recientes primero
+                    .map((comment) => (
+                      <div key={comment.id} className="p-4 bg-white/5 rounded-lg border border-white/10">
+                        <div className="flex items-center gap-3 mb-2">
+                          {comment.userPicture ? (
+                            <img src={comment.userPicture} alt={comment.userName} className="w-8 h-8 rounded-full" />
+                          ) : (
+                            <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                              {comment.userName.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-white font-medium">{comment.userName}</p>
+                            <p className="text-gray-400 text-xs">
+                              {new Date(comment.timestamp).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-gray-200 text-sm leading-relaxed">{comment.text}</p>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 text-center">Sé el primero en comentar este artículo. ¡Tu opinión importa!</p>
+              )}
+            </div>
 
             {/* Artículos relacionados */}
             {relatedArticles.length > 0 && (
@@ -2338,6 +2678,7 @@ export default function LandingPage() {
       </div>
     )
   }
+
 
   // Vista principal (home)
   return (
@@ -2376,7 +2717,7 @@ export default function LandingPage() {
                   onClick={() => handleCategoryClick("smartphones")}
                   className={`transition-colors ${selectedCategory === "smartphones" ? "text-blue-300" : "text-white hover:text-blue-300"}`}
                 >
-                  Gadgets
+                  Smartphones
                 </button>
                 <button
                   onClick={() => handleCategoryClick("tutoriales")}
@@ -2403,14 +2744,88 @@ export default function LandingPage() {
               </form>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden text-white"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
+            {/* Área de autenticación */}
+            <div className="flex items-center gap-4">
+              {currentUser ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-3 backdrop-blur-md bg-white/10 border border-white/20 rounded-full px-4 py-2 hover:bg-white/20 transition-colors"
+                  >
+                    {currentUser.picture ? (
+                      <img
+                        src={currentUser.picture || "/placeholder.svg"}
+                        alt={currentUser.name}
+                        className="w-8 h-8 rounded-full"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">
+                          {currentUser.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <div className="hidden md:block text-left">
+                      <p className="text-white text-sm font-medium">{currentUser.name}</p>
+                      <p className={`text-xs px-2 py-0.5 rounded text-white ${getUserTypeColor(currentUser.userType)}`}>
+                        {getUserTypeLabel(currentUser.userType)}
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Menú de usuario desplegable (solo Cerrar Sesión) */}
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-2 shadow-lg z-50">
+                      <div className="mb-2 pb-2 border-b border-white/20">
+                        <p className="text-white font-medium text-sm px-2">Hola, {currentUser.name}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-3 w-full text-left text-red-400 hover:text-red-300 transition-colors p-2 rounded-lg hover:bg-white/10"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Cerrar Sesión
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={() => {
+                      setAuthMode("login")
+                      setShowAuthModal(true)
+                      resetAuthForm()
+                    }}
+                    variant="ghost"
+                    className="text-white hover:text-blue-300 hover:bg-white/10"
+                  >
+                    Iniciar Sesión
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setAuthMode("register")
+                      setShowAuthModal(true)
+                      resetAuthForm()
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Registrarse
+                  </Button>
+                </div>
+              )}
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-white"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
 
           {/* Menú móvil */}
@@ -2480,13 +2895,211 @@ export default function LandingPage() {
         </div>
       </header>
 
+      {/* Modal de Autenticación */}
+      {showAuthModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">
+                {authMode === "login" && "Iniciar Sesión"}
+                {authMode === "register" && "Crear Cuenta"}
+                {authMode === "forgot" && "Recuperar Contraseña"}
+              </h2>
+              <button onClick={() => setShowAuthModal(false)} className="text-white hover:text-gray-300">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {authError && (
+              <div className="bg-red-600/20 border border-red-500/30 rounded-lg p-3 mb-4">
+                <p className="text-red-200 text-sm">{authError}</p>
+              </div>
+            )}
+
+            {/* Botón de Google Sign-In */}
+            {authMode !== "forgot" && (
+              <div className="mb-6">
+                {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
+                process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID" ? (
+                  <div id="google-signin-modal" className="w-full"></div>
+                ) : (
+                  <div className="bg-yellow-600/20 border border-yellow-500/30 rounded-lg p-4 text-yellow-200">
+                    <p className="text-sm">
+                      <strong>Para desarrolladores:</strong> Google Sign-In no está configurado. Configura
+                      NEXT_PUBLIC_GOOGLE_CLIENT_ID en tu archivo .env.local para habilitarlo.
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-4 my-6">
+                  <div className="flex-1 h-px bg-white/20"></div>
+                  <span className="text-gray-300 text-sm">o</span>
+                  <div className="flex-1 h-px bg-white/20"></div>
+                </div>
+              </div>
+            )}
+
+            {/* Formulario de autenticación */}
+            <form onSubmit={handleEmailAuth} className="space-y-4">
+              {authMode === "register" && (
+                <div>
+                  <label htmlFor="auth-name" className="block text-white text-sm font-medium mb-2">
+                    Nombre completo
+                  </label>
+                  <Input
+                    id="auth-name"
+                    type="text"
+                    value={authForm.name}
+                    onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                    required
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20"
+                    placeholder="Tu nombre completo"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="auth-email" className="block text-white text-sm font-medium mb-2">
+                  Correo electrónico
+                </label>
+                <Input
+                  id="auth-email"
+                  type="email"
+                  value={authForm.email}
+                  onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+                  required
+                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20"
+                  placeholder="tu@email.com"
+                />
+              </div>
+
+              {authMode !== "forgot" && (
+                <div>
+                  <label htmlFor="auth-password" className="block text-white text-sm font-medium mb-2">
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="auth-password"
+                      type={showPassword ? "text" : "password"}
+                      value={authForm.password}
+                      onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20 pr-10"
+                      placeholder="Tu contraseña"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {authMode === "register" && (
+                <>
+                  <div>
+                    <label htmlFor="auth-confirm-password" className="block text-white text-sm font-medium mb-2">
+                      Confirmar contraseña
+                    </label>
+                    <Input
+                      id="auth-confirm-password"
+                      type="password"
+                      value={authForm.confirmPassword}
+                      onChange={(e) => setAuthForm({ ...authForm, confirmPassword: e.target.value })}
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20"
+                      placeholder="Confirma tu contraseña"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="auth-user-type" className="block text-white text-sm font-medium mb-2">
+                      Tipo de cuenta
+                    </label>
+                    <select
+                      id="auth-user-type"
+                      value={authForm.userType}
+                      onChange={(e) =>
+                        setAuthForm({ ...authForm, userType: e.target.value as "reader" | "premium" | "admin" })
+                      }
+                      className="w-full bg-white/10 border border-white/20 text-white rounded-md px-3 py-2 focus:bg-white/20"
+                    >
+                      <option value="reader" className="bg-gray-800">
+                        Lector (Gratis)
+                      </option>
+                      <option value="premium" className="bg-gray-800">
+                        Premium ($9.99/mes)
+                      </option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <Button type="submit" disabled={authLoading} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                {authLoading
+                  ? "Procesando..."
+                  : authMode === "login"
+                    ? "Iniciar Sesión"
+                    : authMode === "register"
+                      ? "Crear Cuenta"
+                      : "Enviar Email de Recuperación"}
+              </Button>
+            </form>
+
+            {/* Enlaces de navegación entre modos */}
+            <div className="mt-6 text-center space-y-2">
+              {authMode === "login" && (
+                <>
+                  <button
+                    onClick={() => setAuthMode("forgot")}
+                    className="text-blue-300 hover:text-blue-400 text-sm underline"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                  <p className="text-gray-300 text-sm">
+                    ¿No tienes cuenta?{" "}
+                    <button
+                      onClick={() => setAuthMode("register")}
+                      className="text-blue-300 hover:text-blue-400 underline"
+                    >
+                      Regístrate aquí
+                    </button>
+                  </p>
+                </>
+              )}
+
+              {authMode === "register" && (
+                <p className="text-gray-300 text-sm">
+                  ¿Ya tienes cuenta?{" "}
+                  <button onClick={() => setAuthMode("login")} className="text-blue-300 hover:text-blue-400 underline">
+                    Inicia sesión aquí
+                  </button>
+                </p>
+              )}
+
+              {authMode === "forgot" && (
+                <p className="text-gray-300 text-sm">
+                  ¿Recordaste tu contraseña?{" "}
+                  <button onClick={() => setAuthMode("login")} className="text-blue-300 hover:text-blue-400 underline">
+                    Inicia sesión aquí
+                  </button>
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Banner de anuncio superior */}
       <section className="py-4 bg-white/5 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4">
           <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 text-center">
             <div className="flex items-center justify-between">
               <span className="text-xs text-blue-200 uppercase tracking-wide">Publicidad</span>
-              <button className="text-blue-200 hover:text-white text-xs">✕</button>
             </div>
 
             <div className="mt-4 flex flex-col md:flex-row items-center justify-between">
@@ -2506,27 +3119,11 @@ export default function LandingPage() {
                 </a>
               </div>
               <div className="w-40 h-32 relative">
-                <video
-                  className="w-full h-full object-cover rounded-lg"
-                  muted
-                  playsInline
-                  loop
-                  autoPlay
-                  preload="metadata"
-                  role="img"
-                  aria-label="iPhone 16 series showcasing front view of iPhone 16 pro, Action Button and Camera Control with dynamic abstract animation of iPhone 16 showing Ultramarine, Teal and Pink colors and ending the animation showcasing iPhone 16 Pro, iPhone 16 and iPhone 16e in White color."
-                >
-                  <source
-                    src="/105/media/us/iphone/family/2025/e7ff365a-cb59-4ce9-9cdf-4cb965455b69/anim/welcome/medium_2x.mp4#t=6.513572"
-                    type="video/mp4"
-                  />
-                </video>
                 <Image
                   src="https://th.bing.com/th/id/R.64c24b79854932ede4a4fef035ee876b?rik=HPfSV6e9RUbMZg&riu=http%3a%2f%2fimg.youtube.com%2fvi%2feDqfg_LexCQ%2fmaxresdefault.jpg&ehk=A90BDg8QynRurVr22VmGkhZJ5lf5YtfbEMWfik12mXU%3d&risl=&pid=ImgRaw&r=0"
                   alt="iPhone 16"
                   fill
                   className="object-cover rounded-lg"
-                  style={{ position: "absolute", top: 0, left: 0 }}
                 />
               </div>
             </div>
@@ -2539,7 +3136,7 @@ export default function LandingPage() {
         <section className="py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">La tecnología nunca fue tan fácil</h1>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">La Tecnología Nunca Fue Tan Fácil</h1>
               <p className="text-xl text-gray-200 mb-8">
                 Descubre los últimos avances en IA, gadgets y tecnología sin complicaciones. Noticias tech para todos,
                 explicadas en español claro y sencillo.
@@ -2667,30 +3264,47 @@ export default function LandingPage() {
                 {selectedCategory === "all" ? "Artículos Recientes" : `Más de ${getCategoryName(selectedCategory)}`}
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Ajustes visuales para hacer los artículos más bonitos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayedRecentNews.map((article) => (
                   <div
                     key={article.id}
-                    className="flex gap-4 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 cursor-pointer"
+                    className="rounded-xl overflow-hidden backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 group cursor-pointer flex flex-col"
                     onClick={() => handleReadMore(article)}
                   >
-                    <div className="relative w-24 h-24 flex-shrink-0">
+                    <div className="relative h-48 w-full">
                       <Image
                         src={article.image || "/placeholder.svg"}
                         alt={article.title}
                         fill
-                        className="object-cover rounded-lg"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
+                      {article.featured && (
+                        <span className="absolute top-3 left-3 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+                          DESTACADO
+                        </span>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <span className={`text-xs px-2 py-1 rounded text-white ${getCategoryColor(article.category)}`}>
-                        {getCategoryName(article.category)}
-                      </span>
-                      <h3 className="text-lg font-medium text-white mb-1 mt-2">{article.title}</h3>
-                      <p className="text-gray-300 text-sm mb-2">{article.summary.substring(0, 100)}...</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-400">{article.timeAgo}</span>
-                        <button className="text-blue-300 hover:text-blue-400 text-sm">Leer más</button>
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium text-white ${getCategoryColor(article.category)}`}>
+                          {getCategoryName(article.category)}
+                        </span>
+                        <span className="text-gray-400 text-xs flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {article.readTime}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2 leading-tight group-hover:text-blue-300 transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-4 flex-1">{article.summary}</p>
+                      <div className="flex justify-between items-center border-t border-white/10 pt-4 mt-auto">
+                        <span className="text-sm text-gray-400">{article.timeAgo}</span>
+                        <div className="flex items-center gap-2">
+                          <Heart className={`w-4 h-4 ${likedArticles.has(article.id) ? "text-red-400 fill-current" : "text-gray-400"}`} />
+                          <span className="text-sm text-gray-400">{article.likes}</span>
+                          <span className="text-blue-300 hover:text-blue-400 text-sm font-medium ml-2">Leer más <ArrowRight className="inline-block w-4 h-4 ml-1" /></span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2761,101 +3375,44 @@ export default function LandingPage() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {/* Información sobre Google Sign-In */}
-                  {!googleUser && (
-                    <div className="text-center">
-                      <p className="text-gray-200 mb-4">Regístrate fácilmente con Google o completa el formulario:</p>
+                <form onSubmit={handleSubscription} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      type="text"
+                      placeholder="Tu nombre"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20"
+                      disabled={!!currentUser}
+                    />
+                    <Input
+                      type="email"
+                      placeholder="Tu correo electrónico"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20"
+                      disabled={!!currentUser}
+                    />
+                  </div>
 
-                      {/* Botón de Google Sign-In */}
-                      <div className="flex justify-center mb-6">
-                        {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
-                        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID" ? (
-                          <div id="google-signin-button" className="max-w-xs"></div>
-                        ) : (
-                          <div className="bg-yellow-600/20 border border-yellow-500/30 rounded-lg p-4 text-yellow-200">
-                            <p className="text-sm">
-                              <strong>Para desarrolladores:</strong> Google Sign-In no está configurado. Configura
-                              NEXT_PUBLIC_GOOGLE_CLIENT_ID en tu archivo .env.local
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      required
+                      className="rounded border-white/20 bg-white/10 text-blue-600 focus:ring-blue-600"
+                    />
+                    <label htmlFor="terms" className="text-sm text-gray-200">
+                      Acepto recibir noticias tech y consejos útiles de Hola, Tecnología News
+                    </label>
+                  </div>
 
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="flex-1 h-px bg-white/20"></div>
-                        <span className="text-gray-300 text-sm">o completa manualmente</span>
-                        <div className="flex-1 h-px bg-white/20"></div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Mostrar información del usuario de Google */}
-                  {googleUser && (
-                    <div className="bg-green-600/20 border border-green-500/30 rounded-lg p-4 mb-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {googleUser.picture && (
-                            <img
-                              src={googleUser.picture || "/placeholder.svg"}
-                              alt={googleUser.name}
-                              className="w-10 h-10 rounded-full"
-                            />
-                          )}
-                          <div>
-                            <p className="text-white font-medium">¡Hola, {googleUser.name}!</p>
-                            <p className="text-green-200 text-sm">{googleUser.email}</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleLogoutGoogle}
-                          className="text-green-200 hover:text-white text-sm underline"
-                        >
-                          Cambiar cuenta
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  <form onSubmit={handleSubscription} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input
-                        type="text"
-                        placeholder="Tu nombre"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20"
-                        disabled={!!googleUser}
-                      />
-                      <Input
-                        type="email"
-                        placeholder="Tu correo electrónico"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20"
-                        disabled={!!googleUser}
-                      />
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="terms"
-                        required
-                        className="rounded border-white/20 bg-white/10 text-blue-600 focus:ring-blue-600"
-                      />
-                      <label htmlFor="terms" className="text-sm text-gray-200">
-                        Acepto recibir noticias tech y consejos útiles de Hola, Tecnología News
-                      </label>
-                    </div>
-
-                    <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                      <Mail className="mr-2 h-4 w-4" /> Suscribirme al Newsletter Tech
-                    </Button>
-                  </form>
-                </div>
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    <Mail className="mr-2 h-4 w-4" /> Suscribirme al Newsletter Tech
+                  </Button>
+                </form>
               )}
             </div>
           </div>
@@ -2898,34 +3455,6 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            <div>
-              <h3 className="text-lg font-bold text-white mb-4">Recursos</h3>
-              <ul className="space-y-2">
-                <li>
-                  <button
-                    onClick={() => handleCategoryClick("tutoriales")}
-                    className="text-gray-200 hover:text-blue-300 transition-colors"
-                  >
-                    Guías para Principiantes
-                  </button>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-200 hover:text-blue-300 transition-colors">
-                    Glosario Tech
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-200 hover:text-blue-300 transition-colors">
-                    Comparativas de Productos
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-200 hover:text-blue-300 transition-colors">
-                    Preguntas Frecuentes
-                  </Link>
-                </li>
-              </ul>
-            </div>
 
             <div>
               <h3 className="text-lg font-bold text-white mb-4">Contacto</h3>
@@ -2961,6 +3490,35 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Contenedor de Toasts (NOTIFICACIONES) */}
+      <div className="fixed bottom-4 right-4 z-[100]">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`
+              relative flex items-center gap-3 p-4 pr-10 rounded-lg shadow-lg mb-3 backdrop-blur-md
+              ${toast.type === "success" ? "bg-green-600/70 border border-green-500/50" : ""}
+              ${toast.type === "error" ? "bg-red-600/70 border border-red-500/50" : ""}
+              ${toast.type === "info" ? "bg-blue-600/70 border border-blue-500/50" : ""}
+              text-white
+            `}
+            role="alert"
+          >
+            {toast.type === "success" && <CheckCircle className="w-5 h-5" />}
+            {toast.type === "error" && <XCircle className="w-5 h-5" />}
+            {toast.type === "info" && <Mail className="w-5 h-5" />}
+            <span>{toast.message}</span>
+            <button
+              onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
+              className="absolute top-2 right-2 text-white/80 hover:text-white"
+              aria-label="Cerrar notificación"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
